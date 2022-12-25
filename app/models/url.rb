@@ -19,12 +19,15 @@ class Url < ApplicationRecord
     true
   end
 
+  def shortened
+    Rails.application.routes.url_helpers.shortened_url(slug:)
+  end
+
   def self.encode(original_url, test: false)
     raise 'Url was re encoded!' if test
 
     url = Url.find_or_initialize_by(original_url:)
-    return url.slug if url.persisted?
-
+    return url.shortened if url.persisted? || url.save
 
     return Url.encode(original_url, ENV['RAILS_ENV'] == 'test') if url.errors.details[:slug].any?
 

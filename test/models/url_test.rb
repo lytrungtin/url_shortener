@@ -104,7 +104,7 @@ class UrlTest < ActiveSupport::TestCase
   end
 
   test 'encode from existing url should return slug from database' do
-    assert_equal Url.encode(urls(:react).original_url), urls(:react).slug
+    assert_equal Url.encode(urls(:react).original_url), urls(:react).shortened
   end
 
   test 'decode from from valid slug should return url from database' do
