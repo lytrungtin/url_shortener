@@ -1,8 +1,7 @@
 // @flow
 import React from 'react';
 
-function renderErrors(errors, name) {
-  console.log(errors)
+function renderErrors(errors) {
   if (!errors) return false;
 
   return errors.map((error, i) =>

@@ -24,7 +24,7 @@ class EncodeUrlForm extends Component {
           <div className="form-group col-sm-12">
             <div className="input-group">
               <Field
-                name="original_url"
+                name="url[original_url]"
                 placeholder="What's URL for encoding?"
                 component="textarea"
                 className="form-control"
@@ -36,7 +36,7 @@ class EncodeUrlForm extends Component {
                   </button>
               </div>
             </div>
-            <Errors name="original_url" errors={errors} />
+            <Errors name="url[original_url]" errors={errors} />
           </div>
         </div>
       </form>
@@ -44,15 +44,6 @@ class EncodeUrlForm extends Component {
   }
 }
 
-const validate = (values) => {
-  const errors = {};
-  if (!values.message) {
-    errors.message = 'Required';
-  }
-  return errors;
-};
-
 export default reduxForm({
-  form: 'encodeUrl',
-  validate,
+  form: 'encodeUrl'
 })(EncodeUrlForm);

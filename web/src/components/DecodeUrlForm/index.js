@@ -24,7 +24,7 @@ class DecodeUrlForm extends Component {
           <div className="form-group col-sm-12">
             <div className="input-group">
               <Field
-                name="shortened_url"
+                name="url[shortened_url]"
                 placeholder="What's URL for decoding?"
                 component="textarea"
                 className="form-control"
@@ -36,7 +36,7 @@ class DecodeUrlForm extends Component {
                   </button>
               </div>
             </div>
-            <Errors name="shortened_url" errors={errors} />
+            <Errors name="url[shortened_url]" errors={errors} />
           </div>
         </div>
       </form>
@@ -44,15 +44,6 @@ class DecodeUrlForm extends Component {
   }
 }
 
-const validate = (values) => {
-  const errors = {};
-  if (!values.shortened_url) {
-    errors.message = 'Required';
-  }
-  return errors;
-};
-
 export default reduxForm({
   form: 'decodeUrl',
-  validate,
 })(DecodeUrlForm);
