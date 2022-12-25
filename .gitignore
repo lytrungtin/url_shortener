@@ -30,3 +30,4 @@
 
 # Ignore Ruby Mine config.
 /.idea
+coverage
