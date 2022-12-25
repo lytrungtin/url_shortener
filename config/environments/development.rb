@@ -1,8 +1,8 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
-  routes.default_url_options[:host] = 'localhost'
-  routes.default_url_options[:port] = 3000
+  routes.default_url_options[:host] = ENV['HOST']
+  routes.default_url_options[:port] = ENV['PORT']
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded any time
