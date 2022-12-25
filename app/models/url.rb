@@ -18,4 +18,23 @@ class Url < ApplicationRecord
     self.slug = SecureRandom.alphanumeric(6) if slug.nil? || slug.empty?
     true
   end
+
+  def self.encode(original_url, test: false)
+    raise 'Url was re encoded!' if test
+
+    url = Url.find_or_initialize_by(original_url:)
+    return url.slug if url.persisted?
+
+
+    return Url.encode(original_url, ENV['RAILS_ENV'] == 'test') if url.errors.details[:slug].any?
+
+    url.errors.full_messages
+  end
+
+  def self.decode(slug)
+    url = Url.find_by(slug:)
+    return url.original_url if url
+
+    ['Shorten URL is not existed']
+  end
 end

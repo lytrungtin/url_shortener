@@ -77,11 +77,37 @@ class UrlTest < ActiveSupport::TestCase
     end
   end
 
-  test 'Net::HTTP raise socket error, then url should not valid' do
-    mock_socket_error = SocketError
-
-    Net::HTTP.stub :get_response, mock_socket_error do
-      assert_not @url.valid?, "#{@url.inspect} should be invalid"
+  test 'generate to existing slug then url should not valid' do
+    existing_slug = urls(:react).slug
+    SecureRandom.stub :alphanumeric, existing_slug do
+      assert_raises 'Url was re encoded!' do
+        Url.encode('https://example.com')
+      end
     end
+  end
+
+  test 'encode to existing slug then Url should call encode again' do
+    existing_slug = urls(:react).slug
+    SecureRandom.stub :alphanumeric, existing_slug do
+      assert_raises 'Url was re encoded!' do
+        Url.encode('https://example.com')
+      end
+    end
+  end
+
+  test 'encode from wrong url should return error messages' do
+    assert_equal Url.encode('example'), ['Original url is invalid']
+  end
+
+  test 'decode from not existed slug should return error messages' do
+    assert_equal Url.decode('something'), ['Shorten URL is not existed']
+  end
+
+  test 'encode from existing url should return slug from database' do
+    assert_equal Url.encode(urls(:react).original_url), urls(:react).slug
+  end
+
+  test 'decode from from valid slug should return url from database' do
+    assert_equal Url.decode(urls(:react).slug), urls(:react).original_url
   end
 end
