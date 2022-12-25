@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require 'minitest/autorun'
+require 'net/http'
 
 class UrlTest < ActiveSupport::TestCase
   def setup
@@ -18,7 +20,7 @@ class UrlTest < ActiveSupport::TestCase
   end
 
   test 'original_url should not be too long' do
-    @url.original_url = "https://example.com/#{'a' * 255}"
+    @url.original_url = "https://google.com/?q=#{'a' * 255}"
     assert_not @url.valid?
   end
 
@@ -49,5 +51,37 @@ class UrlTest < ActiveSupport::TestCase
   test 'slug should be unique' do
     @url.slug = urls(:react).slug
     assert_not @url.valid?, "#{@url.inspect} should be invalid"
+  end
+
+  test 'original_url validation should accept valid' do
+    valid_addresses = %w[https://example.com http://example.COM HTTP://example.com]
+    valid_addresses.each do |valid_address|
+      @url.original_url = valid_address
+      assert @url.valid?, "#{valid_address.inspect} should be valid"
+    end
+  end
+
+  test 'original_url validation should reject invalid' do
+    invalid_addresses = %w[https://example,com http://example. http://example+foo.com]
+    invalid_addresses.each do |invalid_address|
+      @url.original_url = invalid_address
+      assert_not @url.valid?, "#{invalid_address.inspect} should be invalid"
+    end
+  end
+
+  test 'URI module raise invalid uri error, then url should not valid' do
+    mock_invalid_uri_error = URI::InvalidURIError
+
+    URI.stub :parse, mock_invalid_uri_error do
+      assert_not @url.valid?, "#{@url.inspect} should be invalid"
+    end
+  end
+
+  test 'Net::HTTP raise socket error, then url should not valid' do
+    mock_socket_error = SocketError
+
+    Net::HTTP.stub :get_response, mock_socket_error do
+      assert_not @url.valid?, "#{@url.inspect} should be invalid"
+    end
   end
 end
