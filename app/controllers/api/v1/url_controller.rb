@@ -26,11 +26,11 @@ module Api
       private
 
       def encode_params
-        params.permit(:original_url)
+        params.require(:url).permit(:original_url)
       end
 
       def decode_params
-        params.permit(:shortened_url)
+        params.require(:url).permit(:shortened_url)
       end
 
       def validate_decode_params_and_set_slug
