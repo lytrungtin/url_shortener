@@ -77,6 +77,14 @@ class UrlTest < ActiveSupport::TestCase
     end
   end
 
+  test 'Net::HTTP call get_response does not return Net::HTTPResponse, then url should not valid' do
+    mock_not_http_response = MiniTest::Mock
+
+    Net::HTTP.stub :get_response, mock_not_http_response do
+      assert_not @url.valid?, "#{@url.inspect} should be invalid"
+    end
+  end
+
   test 'generate to existing slug then url should not valid' do
     existing_slug = urls(:react).slug
     SecureRandom.stub :alphanumeric, existing_slug do
