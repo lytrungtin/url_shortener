@@ -23,6 +23,12 @@ module Api
         assert_includes response.body, 'Original url is invalid'
       end
 
+      test 'encode invalid format original_url should get error code' do
+        post encode_api_v1_url_index_url, params: { url: { original_url: 'something_wrong' } }
+        assert_response :unprocessable_entity
+        assert_includes response.body, 'Original url is invalid'
+      end
+
       test 'decode valid shortened_url should get original url decoded' do
         post decode_api_v1_url_index_url, params: { url: { shortened_url: urls(:react).shortened } }
         assert_response :success
@@ -37,6 +43,12 @@ module Api
 
       test 'decode invalid host should get error code' do
         post decode_api_v1_url_index_url, params: { url: { shortened_url: "https://google.com/#{urls(:react).slug}" } }
+        assert_response :unprocessable_entity
+        assert_includes response.body, 'Shorten URL is not valid'
+      end
+
+      test 'decode invalid format shortened_url should get error code' do
+        post decode_api_v1_url_index_url, params: { url: { shortened_url: 'something wrong' } }
         assert_response :unprocessable_entity
         assert_includes response.body, 'Shorten URL is not valid'
       end

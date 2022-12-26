@@ -45,5 +45,7 @@ class Url < ApplicationRecord
     return url.original_url if url
 
     ['Shorten URL is not existed']
+  rescue URI::InvalidURIError
+    ['Shorten URL is not valid']
   end
 end
