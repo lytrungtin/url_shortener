@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "aphrodite": "^2.3.1",
+    "babel-eslint": "^10.1.0",
     "dotenv": "^8.1.0",
     "history": "^4.9.0",
     "lodash": "^4.17.21",
@@ -16,19 +17,17 @@
     "react-redux": "^7.1.0",
     "react-router": "4.2.0",
     "react-router-dom": "^5.0.1",
-    "react-scripts": "3.1.1",
+    "react-scripts": "^5.0.1",
     "redux": "^4.0.4",
     "redux-form": "^8.2.6",
-    "redux-thunk": "^2.3.0",
-    "s3": "^4.4.0"
+    "redux-thunk": "^2.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "lint": "eslint --fix --ext .js,.jsx web",
+    "build": "rm -rf build && react-scripts build && cp -r build/* public",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "upload": "node scripts/upload.js",
-    "deploy": "rm -rf build && yarn run build && yarn run upload"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
