@@ -34,7 +34,13 @@ class Url < ApplicationRecord
     url.errors.full_messages
   end
 
-  def self.decode(slug)
+  def self.decode(shortened_url)
+    shortened_uri = URI.parse(shortened_url)
+    if !shortened_uri.is_a?(URI::HTTP) || shortened_uri.host != Rails.application.routes.default_url_options[:host]
+      return ['Shorten URL is not valid']
+    end
+
+    slug = shortened_uri.path.split('/').last
     url = Url.find_by(slug:)
     return url.original_url if url
 

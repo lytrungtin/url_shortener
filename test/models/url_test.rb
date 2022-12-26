@@ -107,12 +107,16 @@ class UrlTest < ActiveSupport::TestCase
     assert_equal Url.encode('example'), ['Original url is invalid']
   end
 
+  test 'decode from not valid slug should return error messages' do
+    assert_equal Url.decode('something'), ['Shorten URL is not valid']
+  end
+
   test 'encode from shorten url should return error messages' do
     assert_equal Url.encode(urls(:react).shortened), ['Original url is invalid']
   end
 
   test 'decode from not existed slug should return error messages' do
-    assert_equal Url.decode('something'), ['Shorten URL is not existed']
+    assert_equal Url.decode('http://localhost/not_existed'), ['Shorten URL is not existed']
   end
 
   test 'encode from existing url should return slug from database' do
@@ -120,6 +124,6 @@ class UrlTest < ActiveSupport::TestCase
   end
 
   test 'decode from from valid slug should return url from database' do
-    assert_equal Url.decode(urls(:react).slug), urls(:react).original_url
+    assert_equal Url.decode(urls(:react).shortened), urls(:react).original_url
   end
 end
