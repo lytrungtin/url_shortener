@@ -3,6 +3,8 @@
 module Api
   module V1
     class UrlController < ApplicationController
+      before_action :decode_params, only: [:decode]
+      before_action :encode_params, only: [:encode]
       before_action :validate_decode_params_and_set_slug, only: [:decode]
 
       def encode
@@ -26,11 +28,15 @@ module Api
       private
 
       def encode_params
-        params.permit(:original_url)
+        @encode_params ||= params.require(:url).permit(:original_url)
+      rescue ActionController::ParameterMissing
+        render json: { status: false, errors: ['Original URL is required'] }, status: :unprocessable_entity
       end
 
       def decode_params
-        params.permit(:shortened_url)
+        @decode_params ||= params.require(:url).permit(:shortened_url)
+      rescue ActionController::ParameterMissing
+        render json: { status: false, errors: ['Shorten URL is required'] }, status: :unprocessable_entity
       end
 
       def validate_decode_params_and_set_slug

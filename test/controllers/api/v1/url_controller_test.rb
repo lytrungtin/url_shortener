@@ -6,21 +6,33 @@ module Api
   module V1
     class UrlControllerTest < ActionDispatch::IntegrationTest
       test 'input valid original_url should get shortened url encode' do
-        post api_v1_url_encode_url, params: { original_url: urls(:react).original_url }
+        post encode_api_v1_url_index_url, params: { url: { original_url: urls(:react).original_url } }
         assert_response :success
         assert_includes response.body, urls(:react).shortened
       end
 
+      test 'input invalid empty original_url params should get error code' do
+        post encode_api_v1_url_index_url, params: { url: { original_url: {} } }
+        assert_response :unprocessable_entity
+        assert_includes response.body, 'Original URL is required'
+      end
+
       test 'input valid shortened_url should get original url decoded' do
-        post api_v1_url_decode_url, params: { shortened_url: urls(:react).shortened }
+        post decode_api_v1_url_index_url, params: { url: { shortened_url: urls(:react).shortened } }
         assert_response :success
         assert_includes response.body, urls(:react).original_url
       end
 
-      test 'input invalid host should get error code' do
-        post api_v1_url_decode_url, params: { shortened_url: "https://google.com/#{urls(:react).slug}" }
+      test 'input invalid empty shortened_url params should get error code' do
+        post decode_api_v1_url_index_url, params: { url: { shortened_url: {} } }
         assert_response :unprocessable_entity
-        assert_includes response.body, "Shorten URL is not valid"
+        assert_includes response.body, 'Shorten URL is required'
+      end
+
+      test 'input invalid host should get error code' do
+        post decode_api_v1_url_index_url, params: { url: { shortened_url: "https://google.com/#{urls(:react).slug}" } }
+        assert_response :unprocessable_entity
+        assert_includes response.body, 'Shorten URL is not valid'
       end
     end
   end
