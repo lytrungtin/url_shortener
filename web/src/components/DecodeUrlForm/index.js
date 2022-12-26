@@ -13,7 +13,7 @@ type Props = {
 class DecodeUrlForm extends Component {
   props: Props
 
-  handleSubmit = data => this.props.onSubmit(data);
+  handleSubmit = (data) => this.props.onSubmit(data);
 
   render() {
     const { handleSubmit, submitting, errors } = this.props;
@@ -31,12 +31,12 @@ class DecodeUrlForm extends Component {
                 style={{ width: '100%' }}
               />
               <div className="input-group-btn">
-                  <button type="submit" className="btn btn-primary" disabled={submitting}>
-                    {submitting ? 'Decoding...' : 'Decode'}
-                  </button>
+                <button type="submit" className="btn btn-primary" disabled={submitting}>
+                  {submitting ? 'Decoding...' : 'Decode'}
+                </button>
               </div>
             </div>
-            <Errors name="url[shortened_url]" errors={errors} />
+            <Errors errors={errors} />
           </div>
         </div>
       </form>

@@ -13,7 +13,7 @@ type Props = {
 class EncodeUrlForm extends Component {
   props: Props
 
-  handleSubmit = data => this.props.onSubmit(data);
+  handleSubmit = (data) => this.props.onSubmit(data);
 
   render() {
     const { handleSubmit, submitting, errors } = this.props;
@@ -31,12 +31,12 @@ class EncodeUrlForm extends Component {
                 style={{ width: '100%' }}
               />
               <div className="input-group-btn">
-                  <button type="submit" className="btn btn-primary" disabled={submitting}>
-                    {submitting ? 'Encoding...' : 'Encode'}
-                  </button>
+                <button type="submit" className="btn btn-primary" disabled={submitting}>
+                  {submitting ? 'Encoding...' : 'Encode'}
+                </button>
               </div>
             </div>
-            <Errors name="url[original_url]" errors={errors} />
+            <Errors errors={errors} />
           </div>
         </div>
       </form>
