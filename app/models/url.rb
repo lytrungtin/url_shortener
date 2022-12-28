@@ -5,7 +5,7 @@ class Url < ApplicationRecord
   validates :original_url, url: true
   validates_uniqueness_of :slug, :original_url
   validates_length_of :original_url, within: 7..255, on: :create, message: 'url too long or too short'
-  validates_length_of :slug, within: 6..6, on: :create, message: 'url too long or too short'
+  validates_length_of :slug, within: 6..6
 
   before_validation :generate_slug
   before_save do
@@ -15,21 +15,21 @@ class Url < ApplicationRecord
   end
 
   def generate_slug
-    self.slug = SecureRandom.alphanumeric(6) if slug.nil? || slug.empty?
-    true
+    return if !slug.nil? && !slug.empty?
+
+    slug = SecureRandom.alphanumeric(6)
+    return generate_slug if Url.exists?(slug:)
+
+    self.slug = slug
   end
 
   def shortened
     Rails.application.routes.url_helpers.shortened_url(slug:)
   end
 
-  def self.encode(original_url, test: false)
-    raise 'Url was re encoded!' if test
-
-    url = Url.find_or_initialize_by(original_url:)
-    return url.shortened if url.persisted? || url.save
-
-    return Url.encode(original_url, ENV['RAILS_ENV'] == 'test') if url.errors.details[:slug].any?
+  def self.encode(original_url)
+    url = Url.new(original_url:)
+    return url.shortened if url.save
 
     url.errors.full_messages
   end
@@ -40,8 +40,7 @@ class Url < ApplicationRecord
       return ['Shorten URL is not valid']
     end
 
-    slug = shortened_uri.path.split('/').last
-    url = Url.find_by(slug:)
+    url = Url.find_by_slug(shortened_uri.path.split('/').last)
     return url.original_url if url
 
     ['Shorten URL is not existed']

@@ -50,7 +50,8 @@ class UrlTest < ActiveSupport::TestCase
 
   test 'slug should be unique' do
     @url.slug = urls(:react).slug
-    assert_not @url.valid?, "#{@url.inspect} should be invalid"
+    assert_not @url.valid?
+    assert @url.errors.details[:slug].present?
   end
 
   test 'original_url validation should accept valid' do
