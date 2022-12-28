@@ -47,3 +47,6 @@ coverage
 .env.production.local
 
 npm-debug.log*
+
+# database info
+/config/database.yml
