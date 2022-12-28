@@ -2,6 +2,7 @@
 
 require 'net/http'
 
+# URL validator for urls from Model should valid, be able to redirect or response success
 class UrlValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     return if value.blank?

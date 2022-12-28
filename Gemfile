@@ -45,6 +45,7 @@ group :development, :test do
   gem 'debug', platforms: %i[mri mingw x64_mingw]
   gem 'dotenv-rails'
   gem 'rubocop'
+  gem 'rubocop-rails'
   gem 'rubocop-rake'
   gem 'simplecov', require: false, group: :test
 end
