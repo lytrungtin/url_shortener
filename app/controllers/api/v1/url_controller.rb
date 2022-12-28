@@ -10,7 +10,8 @@ module Api
         result = Url.encode(encode_params[:original_url])
         return render json: { status: false, errors: result }, status: :unprocessable_entity if result.is_a?(Array)
 
-        render json: { status: true, data: [{ shortened_url: result }] }, status: :ok
+        render json: { status: true, data: [{ original_url: encode_params[:original_url], shortened_url: result }] },
+               status: :ok
       end
 
       def decode
@@ -19,7 +20,8 @@ module Api
         end
         return render json: { status: false, errors: result }, status: :unprocessable_entity if result.is_a?(Array)
 
-        render json: { status: true, data: [{ original_url: result }] }, status: :ok
+        render json: { status: true, data: [{ original_url: result, shortened_url: decode_params[:shortened_url] }] },
+               status: :ok
       end
 
       private

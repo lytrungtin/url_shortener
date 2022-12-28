@@ -8,12 +8,14 @@ module Api
       test 'encode valid original_url should get shortened url encode' do
         post encode_api_v1_url_index_url, params: { url: { original_url: 'https://www.google.com/?q=RailsTutorial' } }
         assert_response :success
+        assert_includes response.body, 'https://www.google.com/?q=RailsTutorial'
         assert_includes response.body, Url.last.shortened
       end
 
       test 'encode with original_url 301 status should get shortened url encode' do
         post encode_api_v1_url_index_url, params: { url: { original_url: 'http://www.fb.com/' } }
         assert_response :success
+        assert_includes response.body, 'http://www.fb.com/'
         assert_includes response.body, Url.last.shortened
       end
 
@@ -38,6 +40,7 @@ module Api
       test 'decode valid shortened_url should get original url decoded' do
         post decode_api_v1_url_index_url, params: { url: { shortened_url: urls(:react).shortened } }
         assert_response :success
+        assert_includes response.body, urls(:react).shortened
         assert_includes response.body, urls(:react).original_url
       end
 
