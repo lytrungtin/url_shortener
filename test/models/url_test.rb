@@ -69,6 +69,22 @@ class UrlTest < ActiveSupport::TestCase
     end
   end
 
+  test 'Net::HTTP call get_response does not return Net::HTTPResponse, then url should not valid' do
+    mock_not_http_response = MiniTest::Mock
+
+    Net::HTTP.stub :get_response, mock_not_http_response do
+      assert_not @url.valid?, "#{@url.inspect} should be invalid"
+    end
+  end
+
+  test 'Net::HTTP call get_response return Timeout::Error, then url should valid' do
+    mock_time_out_error = Timeout::Error.new
+
+    Net::HTTP.stub :get_response, mock_time_out_error do
+      assert_not @url.valid?, "#{@url.inspect} should be invalid"
+    end
+  end
+
   test 'URI module raise invalid uri error, then url should not valid' do
     @url.original_url = 'https://example.com/[%23R]%20'
     assert_not @url.valid?

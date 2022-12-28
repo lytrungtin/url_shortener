@@ -21,12 +21,10 @@ class UrlValidator < ActiveModel::EachValidator
   def uri_response
     return false unless uri
 
-    Timeout.timeout(10) do
-      Rails.cache.fetch("uri_response:#{uri.host.downcase}#{uri.scheme}#{uri.path}") do
-        Net::HTTP.get_response(uri)
-      end
+    Rails.cache.fetch("url_response:#{url_string}") do
+      Timeout.timeout(1) { Net::HTTP.get_response(uri) }
     end
-  rescue SocketError, Errno::ECONNREFUSED, Timeout::Error
+  rescue SocketError, Errno::ECONNREFUSED
     false
   end
 
@@ -39,6 +37,8 @@ class UrlValidator < ActiveModel::EachValidator
       return url_valid?
     end
     false
+  rescue Timeout::Error
+    true
   end
 
   def uri
