@@ -1,14 +1,23 @@
 # frozen_string_literal: true
 
-class RedirectionController < ApplicationController
+class RedirectionController < ActionController::Base
+  before_action :validate_slug
   def redirect
-    url = Url.find_by_slug!(slug_params[:slug])
-    redirect_to url.original_url, allow_other_host: true
+    result = Rails.cache.fetch("decode_shortened_url:#{request.original_url}") do
+      Url.decode(request.original_url)
+    end
+    return not_found if result.is_a?(Array)
+
+    redirect_to result, allow_other_host: true
   end
 
   private
 
-  def slug_params
-    params.permit(:slug)
+  def not_found
+    render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found
+  end
+
+  def validate_slug
+    return not_found if params[:slug].match(/\A[a-zA-Z0-9]*\z/).nil?
   end
 end
