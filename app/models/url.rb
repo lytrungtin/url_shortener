@@ -5,7 +5,7 @@ class Url < ApplicationRecord
   validates :original_url, url: true
   validates_uniqueness_of :slug
   validates_length_of :original_url, within: 10..2048
-  validates_length_of :slug, within: 6..6
+  validates_length_of :slug, within: 4..4
 
   before_validation :generate_slug
   before_save do
@@ -20,7 +20,7 @@ class Url < ApplicationRecord
   def generate_slug
     return if !slug.nil? && !slug.empty?
 
-    slug = SecureRandom.alphanumeric(6)
+    slug = SecureRandom.alphanumeric(4)
     return generate_slug if Url.exists?(slug:)
 
     self.slug = slug
