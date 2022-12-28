@@ -7,9 +7,7 @@ module Api
       before_action :encode_params, only: [:encode]
 
       def encode
-        result = Rails.cache.fetch("encode_original_url:#{encode_params[:original_url]}") do
-          Url.encode(encode_params[:original_url])
-        end
+        result = Url.encode(encode_params[:original_url])
         return render json: { status: false, errors: result }, status: :unprocessable_entity if result.is_a?(Array)
 
         render json: { status: true, data: [{ shortened_url: result }] }, status: :ok

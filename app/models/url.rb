@@ -38,7 +38,7 @@ class Url < ApplicationRecord
   end
 
   def self.decode(shortened_url)
-    shortened_uri = URI.parse(shortened_url)
+    shortened_uri = Rails.cache.fetch("uri_from_url:#{shortened_url}") { URI.parse(shortened_url) }
     if !shortened_uri.is_a?(URI::HTTP) || shortened_uri.host != Rails.application.routes.default_url_options[:host]
       return ['Shorten URL is not valid']
     end
