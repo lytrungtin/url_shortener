@@ -6,9 +6,15 @@ module Api
   module V1
     class UrlControllerTest < ActionDispatch::IntegrationTest
       test 'encode valid original_url should get shortened url encode' do
-        post encode_api_v1_url_index_url, params: { url: { original_url: urls(:react).original_url } }
+        post encode_api_v1_url_index_url, params: { url: { original_url: 'https://www.google.com/?q=RailsTutorial' } }
         assert_response :success
-        assert_includes response.body, urls(:react).shortened
+        assert_includes response.body, Url.last.shortened
+      end
+
+      test 'encode with original_url 301 status should get shortened url encode' do
+        post encode_api_v1_url_index_url, params: { url: { original_url: 'http://www.fb.com/' } }
+        assert_response :success
+        assert_includes response.body, Url.last.shortened
       end
 
       test 'encode invalid empty original_url params should get error code' do

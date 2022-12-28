@@ -20,15 +20,13 @@ class UrlTest < ActiveSupport::TestCase
   end
 
   test 'original_url should not be too long' do
-    @url.original_url = "https://google.com/?q=#{'a' * 255}"
+    @url.original_url = "https://google.com/?q=#{'a' * 2049}"
     assert_not @url.valid?
   end
 
-  test 'original_url should be unique' do
-    duplicate_url = @url.dup
-    duplicate_url.original_url = @url.original_url
-    @url.save
-    assert_not duplicate_url.valid?, "#{duplicate_url.inspect} should be invalid"
+  test 'original_url should not be from host' do
+    @url.original_url = 'https://github.io/aBcDeF'
+    assert_not @url.valid?
   end
 
   test 'original_url should be saved as lower-case' do
@@ -58,7 +56,7 @@ class UrlTest < ActiveSupport::TestCase
     valid_addresses = %w[https://example.com http://example.COM HTTP://example.com]
     valid_addresses.each do |valid_address|
       @url.original_url = valid_address
-      assert @url.valid?, "#{valid_address.inspect} should be valid"
+      assert @url.valid?
     end
   end
 
@@ -66,46 +64,19 @@ class UrlTest < ActiveSupport::TestCase
     invalid_addresses = %w[https://example,com http://example. http://example+foo.com]
     invalid_addresses.each do |invalid_address|
       @url.original_url = invalid_address
-      assert_not @url.valid?, "#{invalid_address.inspect} should be invalid"
+      assert_not @url.valid?
+      assert @url.errors.details[:original_url].present?
     end
   end
 
   test 'URI module raise invalid uri error, then url should not valid' do
-    mock_invalid_uri_error = URI::InvalidURIError
-
-    URI.stub :parse, mock_invalid_uri_error do
-      assert_not @url.valid?, "#{@url.inspect} should be invalid"
-    end
-  end
-
-  test 'Net::HTTP call get_response does not return Net::HTTPResponse, then url should not valid' do
-    mock_not_http_response = MiniTest::Mock
-
-    Net::HTTP.stub :get_response, mock_not_http_response do
-      assert_not @url.valid?, "#{@url.inspect} should be invalid"
-    end
-  end
-
-  test 'generate to existing slug then url should not valid' do
-    existing_slug = urls(:react).slug
-    SecureRandom.stub :alphanumeric, existing_slug do
-      assert_raises 'Url was re encoded!' do
-        Url.encode('https://example.com')
-      end
-    end
-  end
-
-  test 'encode to existing slug then Url should call encode again' do
-    existing_slug = urls(:react).slug
-    SecureRandom.stub :alphanumeric, existing_slug do
-      assert_raises 'Url was re encoded!' do
-        Url.encode('https://example.com')
-      end
-    end
+    @url.original_url = 'https://example.com/[%23R]%20'
+    assert_not @url.valid?
+    assert @url.errors.details[:original_url].present?
   end
 
   test 'encode from wrong url should return error messages' do
-    assert_equal Url.encode('example'), ['Original url is invalid']
+    assert_equal Url.encode('this is example'), ['Original url is invalid']
   end
 
   test 'decode from not valid slug should return error messages' do
@@ -117,11 +88,11 @@ class UrlTest < ActiveSupport::TestCase
   end
 
   test 'decode from not existed slug should return error messages' do
-    assert_equal Url.decode('http://localhost/not_existed'), ['Shorten URL is not existed']
+    assert_equal Url.decode('https://github.io/not_existed'), ['Shorten URL is not existed']
   end
 
-  test 'encode from existing url should return slug from database' do
-    assert_equal Url.encode(urls(:react).original_url), urls(:react).shortened
+  test 'encode from existing url should return new slug' do
+    assert_equal Url.encode(urls(:react).original_url), Url.last.shortened
   end
 
   test 'decode from from valid slug should return url from database' do
