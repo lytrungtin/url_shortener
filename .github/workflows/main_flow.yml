@@ -42,7 +42,7 @@ jobs:
       - name: Fix code coverage paths
         working-directory: ./coverage
         run: |
-          sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' .resultset.json
+          sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.json
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -52,12 +52,12 @@ jobs:
           args:
             -Dsonar.projectKey=lytrungtin_url_shortener
             -Dsonar.organization=lytrungtin
-            -Dsonar.exclusions=/vendor/**
+            -Dsonar.exclusions=/vendor/**,/test/**
             -Dsonar.java.file.suffixes=-
             -Dsonar.c.file.suffixes=-
             -Dsonar.cpp.file.suffixes=-
             -Dsonar.objc.file.suffixes=-
-            -Dsonar.ruby.coverage.reportPaths=/home/runner/work/url_shortener/url_shortener/coverage/.resultset.json
+            -Dsonar.ruby.coverage.reportPaths=coverage/coverage.json
   lint:
     runs-on: ubuntu-latest
     steps:
