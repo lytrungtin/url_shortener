@@ -39,6 +39,10 @@ jobs:
       # Add or replace test runners here
       - name: Run tests
         run: bin/rake
+      - name: Fix code coverage paths
+        working-directory: ./coverage
+        run: |
+          sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' .resultset.json
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
