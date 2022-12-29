@@ -4,9 +4,9 @@ require 'test_helper'
 
 class RedirectionControllerTest < ActionDispatch::IntegrationTest
   test 'should redirect to original url' do
-    react = urls(:react)
-    get shortened_url(slug: react.slug)
-    assert_redirected_to react.original_url
+    urls(:react).save!
+    get shortened_url(slug: urls(:react).slug)
+    assert_redirected_to urls(:react).original_url
   end
 
   test 'access with wrong slug format should render to not found' do

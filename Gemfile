@@ -18,7 +18,7 @@ gem 'puma', '~> 5.0'
 # gem "jbuilder"
 
 # Use Redis adapter to run Action Cable in production
-# gem "redis", "~> 4.0"
+gem 'redis', '~> 4.0'
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
@@ -44,6 +44,7 @@ group :development, :test do
   gem 'bundle-audit'
   gem 'debug', platforms: %i[mri mingw x64_mingw]
   gem 'dotenv-rails'
+  gem 'fakeredis'
   gem 'rubocop'
   gem 'rubocop-rails'
   gem 'rubocop-rake'

@@ -9,9 +9,12 @@ class UrlTest < ActiveSupport::TestCase
     @url = Url.new(original_url: 'https://example.com')
   end
 
-  test 'should be valid and generate slug' do
+  test 'should be valid and generate slug, set redis value' do
     assert @url.valid?
     assert @url.slug.present?
+
+    urls(:react).save!
+    assert urls(:react).redis_original_url.present?
   end
 
   test 'original_url should be present' do
@@ -42,7 +45,7 @@ class UrlTest < ActiveSupport::TestCase
   end
 
   test 'slug should have a minimum length' do
-    @url.slug = SecureRandom.alphanumeric(5)
+    @url.slug = SecureRandom.alphanumeric(3)
     assert_not @url.valid?
   end
 

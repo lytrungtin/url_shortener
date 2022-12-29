@@ -38,6 +38,7 @@ module Api
       end
 
       test 'decode valid shortened_url should get original url decoded' do
+        urls(:react).save!
         post decode_api_v1_url_index_url, params: { url: { shortened_url: urls(:react).shortened } }
         assert_response :success
         assert_includes response.body, urls(:react).shortened
