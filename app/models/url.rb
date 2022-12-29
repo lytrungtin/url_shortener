@@ -73,7 +73,7 @@ class Url < ApplicationRecord
     return if !slug.nil? && !slug.strip.nil?
 
     slug = SecureRandom.alphanumeric(4)
-    return generate_slug if Url.exists?(slug:)
+    return generate_slug if redis.get("urls:original_url:#{slug}")
 
     self.slug = slug
   end
