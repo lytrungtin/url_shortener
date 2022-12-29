@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class RedirectionController < ActionController::Base
+# Handles redirections for All urls already shortened with :slug param
+class RedirectionController < ApplicationController
   before_action :validate_slug
   def redirect
     result = Rails.cache.fetch("decode_shortened_url:#{request.original_url}") do
@@ -14,7 +15,7 @@ class RedirectionController < ActionController::Base
   private
 
   def not_found
-    render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found
+    render file: Rails.root.join('/public/404.html'), layout: false, status: :not_found
   end
 
   def validate_slug

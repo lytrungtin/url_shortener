@@ -2,9 +2,16 @@
 
 ENV['RAILS_ENV'] ||= 'test'
 require 'simplecov'
-require "simplecov_json_formatter"
-SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter
-SimpleCov.start
+require 'simplecov_json_formatter'
+
+# Generate HTML and JSON reports
+SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new([
+                                                                  SimpleCov::Formatter::HTMLFormatter,
+                                                                  SimpleCov::Formatter::JSONFormatter
+                                                                ])
+SimpleCov.start do
+  enable_coverage :branch
+end
 require_relative '../config/environment'
 require 'rails/test_help'
 

@@ -40,13 +40,12 @@ gem 'rack-cors'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-  gem 'debug', platforms: %i[mri mingw x64_mingw]
-  gem 'dotenv-rails'
-  gem 'simplecov', require: false, group: :test
-end
-
-group :development do
   gem 'brakeman'
   gem 'bundle-audit'
+  gem 'debug', platforms: %i[mri mingw x64_mingw]
+  gem 'dotenv-rails'
   gem 'rubocop'
+  gem 'rubocop-rails'
+  gem 'rubocop-rake'
+  gem 'simplecov', group: :test
 end

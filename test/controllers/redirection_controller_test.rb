@@ -14,6 +14,11 @@ class RedirectionControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test 'access with invalid slug format should render to not found' do
+    get shortened_url(slug: 'te@@st')
+    assert_response :not_found
+  end
+
   test 'access with not existed slug should render to not found' do
     get shortened_url(slug: '1a2b3c')
     assert_response :not_found

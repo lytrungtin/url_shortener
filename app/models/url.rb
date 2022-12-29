@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
+# Storing and validating URLs input before generate shorten slug
 class Url < ApplicationRecord
-  validates_presence_of :original_url, :slug
+  validates :original_url, :slug, presence: true
   validates :original_url, url: true
-  validates_uniqueness_of :slug
-  validates_length_of :original_url, within: 10..2048
-  validates_length_of :slug, within: 4..4
+  validates :slug, uniqueness: true
+  validates :original_url, length: { within: 10..2048 }
+  validates :slug, length: { within: 4..4 }
 
   before_validation :generate_slug
   before_save do
@@ -18,7 +19,7 @@ class Url < ApplicationRecord
   end
 
   def generate_slug
-    return if !slug.nil? && !slug.empty?
+    return if !slug.nil? && !slug.strip.nil?
 
     slug = SecureRandom.alphanumeric(4)
     return generate_slug if Url.exists?(slug:)
@@ -43,7 +44,7 @@ class Url < ApplicationRecord
       return ['Shorten URL is not valid']
     end
 
-    url = Url.find_by_slug(shortened_uri.path.split('/').last)
+    url = Url.find_by(slug: shortened_uri.path.split('/').last)
     return url.original_url if url
 
     ['Shorten URL is not existed']

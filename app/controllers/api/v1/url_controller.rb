@@ -2,6 +2,7 @@
 
 module Api
   module V1
+    # /api/v1/url
     class UrlController < ApplicationController
       before_action :decode_params, only: [:decode]
       before_action :encode_params, only: [:encode]
