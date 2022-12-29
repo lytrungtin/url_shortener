@@ -5,7 +5,7 @@ function renderErrors(errors) {
   if (!errors) return false;
 
   return errors.map((error) => (
-    <div style={{ fontSize: '85%', color: '#cc5454' }}>
+    <div key={error} style={{ fontSize: '85%', color: '#cc5454' }}>
       {`${error}`}
     </div>
   ),);

@@ -26,10 +26,6 @@ class Home extends Component {
   static contextTypes = {
     router: PropTypes.object
   }
-
-  componentDidMount() {
-  }
-
   props: Props
   handleEncodeURLSubmit = (data) => this.props.encodeUrl(data, this.context.router);
 
