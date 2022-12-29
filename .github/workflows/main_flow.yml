@@ -38,7 +38,22 @@ jobs:
         run: bin/rails db:schema:load
       # Add or replace test runners here
       - name: Run tests
-        run: bin/rake test
+        run: bin/rake
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args:
+            -Dsonar.projectKey=lytrungtin_url_shortener
+            -Dsonar.organization=lytrungtin
+            -Dsonar.exclusions=/vendor/**
+            -Dsonar.java.file.suffixes=-
+            -Dsonar.c.file.suffixes=-
+            -Dsonar.cpp.file.suffixes=-
+            -Dsonar.objc.file.suffixes=-
+            -Dsonar.ruby.coverage.reportPaths=/home/runner/work/url_shortener/url_shortener/coverage/.resultset.json
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -54,4 +69,4 @@ jobs:
       - name: Security audit application code
         run: bundle exe brakeman -q -w2
       - name: Lint Ruby files
-        run: bundle exec rubocop --parallel
+        run: bundle exec rubocop -A --parallel --require rubocop-rails
