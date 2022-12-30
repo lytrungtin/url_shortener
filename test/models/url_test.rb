@@ -87,20 +87,6 @@ class UrlTest < ActiveSupport::TestCase
     end
   end
 
-  test 'Net::HTTP call get_response return Errno::ECONNREFUSED, then url should valid' do
-    mock_errno_econn_refused = Errno::ECONNREFUSED.new
-    Net::HTTP.stub :get_response, mock_errno_econn_refused do
-      assert_not @url.valid?, "#{@url.inspect} should be invalid"
-    end
-  end
-
-  test 'Net::HTTP call get_response return SocketError, then url should valid' do
-    mock_socket_error = SocketError.new
-    Net::HTTP.stub :get_response, mock_socket_error do
-      assert_not @url.valid?, "#{@url.inspect} should be invalid"
-    end
-  end
-
   test 'URI module raise invalid uri error, then url should not valid' do
     @url.original_url = 'https://exam ple.com'
     assert_not @url.valid?

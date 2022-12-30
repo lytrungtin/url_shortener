@@ -25,8 +25,6 @@ class UrlValidator < ActiveModel::EachValidator
     end
 
     Rails.cache.fetch("url_response:#{url_string}") { Timeout.timeout(1) { Net::HTTP.get_response(uri) } }
-  rescue SocketError, Errno::ECONNREFUSED => e
-    Rails.logger.error "#{self.class} - #{e.class}: #{e.message}" && false
   end
 
   def handle_response(uri_response)
@@ -57,10 +55,8 @@ class UrlValidator < ActiveModel::EachValidator
     uri = Rails.cache.fetch("uri_from_url:#{url_string}") do
       Addressable::URI.parse(url_string)
     end
-    return uri if uri.host != default_host
+    return uri if uri.is_a?(Addressable::URI) && uri.host != default_host
 
     false
-  rescue Addressable::URI::InvalidURIError => e
-    Rails.logger.error (["#{self.class} - #{e.class}: #{e.message}"] + e.backtrace).join("\n") && false
   end
 end

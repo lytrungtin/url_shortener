@@ -35,12 +35,14 @@ class Url < ApplicationRecord
       url.errors.full_messages
     end
 
+    def shortened_uri_valid?(shortened_uri)
+      shortened_uri.is_a?(Addressable::URI) && %w[http https].include?(shortened_uri.scheme.try(&:downcase)) &&
+        shortened_uri.host == Rails.application.routes.default_url_options[:host]
+    end
+
     def get_slug_from_shortened_url(shortened_url)
       shortened_uri = Rails.cache.fetch("uri_from_url:#{shortened_url}") { Addressable::URI.parse(shortened_url) }
-      if !%w[http https].include?(shortened_uri.scheme.try(&:downcase)) ||
-         shortened_uri.host != Rails.application.routes.default_url_options[:host]
-        return false
-      end
+      return false unless shortened_uri_valid?(shortened_uri)
 
       shortened_uri.path.split('/').last
     end
@@ -53,9 +55,6 @@ class Url < ApplicationRecord
       return url if url
 
       ['Shorten URL is not existed']
-    rescue Addressable::URI::InvalidURIError => e
-      Rails.logger.error "#{self.class} - #{e.class}: #{e.message}"
-      ['Shorten URL is not valid']
     end
 
     def redis
@@ -72,13 +71,11 @@ class Url < ApplicationRecord
   def generate_slug
     return if !slug.nil? && !slug.strip.nil?
 
-    slug = SecureRandom.alphanumeric(4)
-    return generate_slug if redis.get("urls:original_url:#{slug}")
-
-    self.slug = slug
+    self.slug = SecureRandom.alphanumeric(4)
+    return generate_slug if redis.get(original_url_key)
   end
 
   def original_url_key
-    @original_url_key ||= "urls:original_url:#{slug}"
+    "urls:original_url:#{slug}"
   end
 end
