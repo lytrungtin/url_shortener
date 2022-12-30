@@ -4,19 +4,20 @@
 class Url < ApplicationRecord
   validates :original_url, :slug, presence: true
   validates :original_url, url: true
-  validates :slug, uniqueness: true
   validates :original_url, length: { within: 10..2048 }
   validates :slug, length: { within: 4..6 }
 
   before_validation :generate_slug
-  before_save do
-    original_uri = Rails.cache.fetch("uri_from_url:#{original_url}") do
-      Addressable::URI.parse(original_url)
-    end
+  after_validation do
+    if errors.empty?
+      original_uri = Rails.cache.fetch("uri_from_url:#{original_url}") do
+        Addressable::URI.parse(original_url)
+      end
 
-    original_uri.host = original_uri.host.try(&:downcase)
-    self.original_url = original_uri.to_s
-    redis.set(original_url_key, original_url)
+      original_uri.host = original_uri.host.try(&:downcase)
+      self.original_url = original_uri.to_s
+      redis.set(original_url_key, original_url)
+    end
   end
 
   def redis_original_url
@@ -30,7 +31,7 @@ class Url < ApplicationRecord
   class << self
     def encode(original_url)
       url = Url.new(original_url:)
-      return url.shortened if url.save
+      return url.shortened if url.valid?
 
       url.errors.full_messages
     end
@@ -68,11 +69,13 @@ class Url < ApplicationRecord
     @redis ||= Redis.new
   end
 
-  def generate_slug
-    return if !slug.nil? && !slug.strip.nil?
+  def slug_existed?
+    redis.get(original_url_key)
+  end
 
+  def generate_slug
     self.slug = SecureRandom.alphanumeric(4)
-    return generate_slug if redis.get(original_url_key)
+    return generate_slug if slug_existed?
   end
 
   def original_url_key

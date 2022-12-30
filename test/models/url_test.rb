@@ -7,6 +7,7 @@ require 'net/http'
 class UrlTest < ActiveSupport::TestCase
   def setup
     @url = Url.new(original_url: 'https://example.com')
+    @url.valid?
   end
 
   test 'should be valid and generate slug, set redis value' do
@@ -39,20 +40,17 @@ class UrlTest < ActiveSupport::TestCase
     assert_equal 'https://www.google.com/?q=RailsTutorial', @url.reload.original_url
   end
 
-  test 'slug should be present' do
-    @url.slug = ' ' * 6
-    assert_not @url.valid?
+  test 'slug should always generate when encode' do
+    new_slug = SecureRandom.alphanumeric(3)
+    @url.slug = new_slug
+    @url.valid?
+    assert_not_equal @url.slug, new_slug
   end
 
-  test 'slug should have a minimum length' do
-    @url.slug = SecureRandom.alphanumeric(3)
-    assert_not @url.valid?
-  end
-
-  test 'slug should be unique' do
+  test 'slug should be generate if existed before' do
     @url.slug = urls(:react).slug
-    assert_not @url.valid?
-    assert @url.errors.details[:slug].present?
+    @url.valid?
+    assert_not_equal @url.slug, urls(:react).slug
   end
 
   test 'original_url validation should accept valid' do
@@ -115,10 +113,15 @@ class UrlTest < ActiveSupport::TestCase
   end
 
   test 'encode from existing url should return new slug' do
-    assert_equal Url.encode(urls(:react).original_url), Url.last.shortened
+    redis = Redis.new
+    existing_original_url = redis.get(redis.scan_each(match: 'urls:original_url:*').first)
+    encoding_url = Url.encode(existing_original_url)
+    last_slug = Redis.new.keys.last.split(':').last
+    shortened_url = Rails.application.routes.url_helpers.shortened_url(slug: last_slug)
+    assert_equal encoding_url, shortened_url
   end
 
-  test 'decode from valid slug should return url from database' do
+  test 'decode from valid slug should return url from redis' do
     urls(:react).save!
     assert_equal Url.decode(urls(:react).shortened), urls(:react).original_url
   end

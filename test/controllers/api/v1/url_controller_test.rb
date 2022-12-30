@@ -9,14 +9,18 @@ module Api
         post encode_api_v1_url_index_url, params: { url: { original_url: 'https://www.google.com/?q=RailsTutorial' } }
         assert_response :success
         assert_includes response.body, 'https://www.google.com/?q=RailsTutorial'
-        assert_includes response.body, Url.last.shortened
+        last_slug = Redis.new.keys.last.split(':').last
+        shortened_url = Rails.application.routes.url_helpers.shortened_url(slug: last_slug)
+        assert_includes response.body, shortened_url
       end
 
       test 'encode with original_url 301 status should get shortened url encode' do
-        post encode_api_v1_url_index_url, params: { url: { original_url: 'http://www.fb.com/' } }
+        post encode_api_v1_url_index_url, params: { url: { original_url: 'https://www.fb.com/' } }
         assert_response :success
-        assert_includes response.body, 'http://www.fb.com/'
-        assert_includes response.body, Url.last.shortened
+        assert_includes response.body, 'https://www.fb.com/'
+        last_slug = Redis.new.keys.last.split(':').last
+        shortened_url = Rails.application.routes.url_helpers.shortened_url(slug: last_slug)
+        assert_includes response.body, shortened_url
       end
 
       test 'encode invalid empty original_url params should get error code' do
