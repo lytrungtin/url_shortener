@@ -64,7 +64,7 @@ class UrlTest < ActiveSupport::TestCase
   end
 
   test 'original_url validation should reject invalid' do
-    invalid_addresses = %w[https://example,com http://example. http://example+foo.com]
+    invalid_addresses = %w[https://example,com http://example. http://example+foo.com localhost]
     invalid_addresses.each do |invalid_address|
       @url.original_url = invalid_address
       assert_not @url.valid?
@@ -82,16 +82,34 @@ class UrlTest < ActiveSupport::TestCase
 
   test 'Net::HTTP call get_response return Timeout::Error, then url should valid' do
     mock_time_out_error = Timeout::Error.new
-
     Net::HTTP.stub :get_response, mock_time_out_error do
       assert_not @url.valid?, "#{@url.inspect} should be invalid"
     end
   end
 
+  test 'Net::HTTP call get_response return Errno::ECONNREFUSED, then url should valid' do
+    mock_errno_econn_refused = Errno::ECONNREFUSED.new
+    Net::HTTP.stub :get_response, mock_errno_econn_refused do
+      assert_not @url.valid?, "#{@url.inspect} should be invalid"
+    end
+  end
+
+  test 'Net::HTTP call get_response return SocketError, then url should valid' do
+    mock_socket_error = SocketError.new
+    Net::HTTP.stub :get_response, mock_socket_error do
+      assert_not @url.valid?, "#{@url.inspect} should be invalid"
+    end
+  end
+
   test 'URI module raise invalid uri error, then url should not valid' do
-    @url.original_url = 'https://example.com/[%23R]%20'
+    @url.original_url = 'https://exam ple.com'
     assert_not @url.valid?
     assert @url.errors.details[:original_url].present?
+  end
+
+  test 'URL is redirect to another, then check last url should valid' do
+    @url.original_url = 'http://bit.ly'
+    assert @url.valid?
   end
 
   test 'encode from wrong url should return error messages' do
@@ -114,7 +132,8 @@ class UrlTest < ActiveSupport::TestCase
     assert_equal Url.encode(urls(:react).original_url), Url.last.shortened
   end
 
-  test 'decode from from valid slug should return url from database' do
+  test 'decode from valid slug should return url from database' do
+    urls(:react).save!
     assert_equal Url.decode(urls(:react).shortened), urls(:react).original_url
   end
 end

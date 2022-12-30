@@ -20,15 +20,19 @@ class UrlValidator < ActiveModel::EachValidator
     uri = uri(url_string)
     return false unless uri
 
-    Rails.cache.fetch("url_response:#{url_string}") do
-      Timeout.timeout(1) { Net::HTTP.get_response(uri) }
+    if PublicSuffix.valid?(uri.host, default_rule: nil) && !%w[example.com bit.ly localhost].include?(uri.host)
+      return true
     end
-  rescue SocketError, Errno::ECONNREFUSED
-    false
+
+    Rails.cache.fetch("url_response:#{url_string}") { Timeout.timeout(1) { Net::HTTP.get_response(uri) } }
+  rescue SocketError, Errno::ECONNREFUSED => e
+    Rails.logger.error "#{self.class} - #{e.class}: #{e.message}" && false
   end
 
   def handle_response(uri_response)
     case uri_response
+    when true
+      true
     when Net::HTTPSuccess, Net::HTTPNotModified
       true
     when Net::HTTPRedirection
@@ -39,6 +43,10 @@ class UrlValidator < ActiveModel::EachValidator
   end
 
   def url_valid?(url_string)
+    url_regexp = %r{\A(http|https)://[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(/.*)?\z}ix
+
+    return false unless url_string =~ url_regexp ? true : false
+
     uri_response = uri_response(url_string)
     handle_response(uri_response)
   rescue Timeout::Error
@@ -47,15 +55,12 @@ class UrlValidator < ActiveModel::EachValidator
 
   def uri(url_string)
     uri = Rails.cache.fetch("uri_from_url:#{url_string}") do
-      URI.parse(url_string)
+      Addressable::URI.parse(url_string)
     end
-    if uri.is_a?(URI::HTTP)
-      return false if uri.host == default_host
+    return uri if uri.host != default_host
 
-      return uri
-    end
     false
-  rescue URI::InvalidURIError
-    false
+  rescue Addressable::URI::InvalidURIError => e
+    Rails.logger.error (["#{self.class} - #{e.class}: #{e.message}"] + e.backtrace).join("\n") && false
   end
 end

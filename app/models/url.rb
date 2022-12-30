@@ -11,13 +11,11 @@ class Url < ApplicationRecord
   before_validation :generate_slug
   before_save do
     original_uri = Rails.cache.fetch("uri_from_url:#{original_url}") do
-      URI.parse(original_url)
+      Addressable::URI.parse(original_url)
     end
 
-    original_uri.host = original_uri.host.downcase
+    original_uri.host = original_uri.host.try(&:downcase)
     self.original_url = original_uri.to_s
-  end
-  after_save do
     redis.set(original_url_key, original_url)
   end
 
@@ -38,8 +36,9 @@ class Url < ApplicationRecord
     end
 
     def get_slug_from_shortened_url(shortened_url)
-      shortened_uri = Rails.cache.fetch("uri_from_url:#{shortened_url}") { URI.parse(shortened_url) }
-      if !shortened_uri.is_a?(URI::HTTP) || shortened_uri.host != Rails.application.routes.default_url_options[:host]
+      shortened_uri = Rails.cache.fetch("uri_from_url:#{shortened_url}") { Addressable::URI.parse(shortened_url) }
+      if !%w[http https].include?(shortened_uri.scheme.try(&:downcase)) ||
+         shortened_uri.host != Rails.application.routes.default_url_options[:host]
         return false
       end
 
@@ -54,7 +53,8 @@ class Url < ApplicationRecord
       return url if url
 
       ['Shorten URL is not existed']
-    rescue URI::InvalidURIError
+    rescue Addressable::URI::InvalidURIError => e
+      Rails.logger.error "#{self.class} - #{e.class}: #{e.message}"
       ['Shorten URL is not valid']
     end
 
