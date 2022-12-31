@@ -114,10 +114,12 @@ class UrlTest < ActiveSupport::TestCase
 
   test 'encode from existing url should return new slug' do
     redis = Redis.new
-    existing_original_url = redis.get(redis.scan_each(match: 'urls:original_url:*').first)
-    encoding_url = Url.encode(existing_original_url)
-    last_slug = Redis.new.keys.last.split(':').last
+    first_slug = redis.keys.first.split(':').last
+    first_original_url = redis.get(redis.keys.first)
+    encoding_url = Url.encode(first_original_url)
+    last_slug = redis.keys.last.split(':').last
     shortened_url = Rails.application.routes.url_helpers.shortened_url(slug: last_slug)
+    assert_not_equal first_slug, last_slug
     assert_equal encoding_url, shortened_url
   end
 

@@ -21,6 +21,7 @@ cd url_shortener
 * Copy env values file from example
 ```shell
 cp .env.example .env
+cp config/database.yml.sample config/database.yml
 ```
 * Prepare database
 ```shell
@@ -177,10 +178,11 @@ npm run start
   - The project uses Net:HTTP to get request from other sites a lot. 
   - In addition to queries database, Take full advantage of Rails’ built-in action, page and fragment caching. 
   - Use memcache to cache results that you’d otherwise pull from your database or request info from urls.
-  - In addition to using database to store slugs along original urls, we can generate them to html, json, yaml files. 
+  - In addition to using database to store slugs along original urls, we can generate them to html, json, yaml. 
+  - Implement use RDMS less, fully change to Redis for storing. Remove database connection for all requests.
   - Reconfiguring the server when accessing it will redirect directly from the file without querying any data from the database.
 
 - **Maintainability**:
-  - Should implement RSPEC for unit test, Minitest is not working fully as I expected, I was wrong in choosing it.
+  - Should implement RSPEC for unit test.
   - Github actions, Heroku pipeline, PR preview env, staging env already installed workflows, and activated package issues security alert bots can proactively inform notifications if dependencies need to be updated or replaced.
   
