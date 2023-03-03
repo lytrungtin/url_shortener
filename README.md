@@ -23,6 +23,10 @@ cd url_shortener
 cp .env.example .env
 cp config/database.yml.sample config/database.yml
 ```
+* Bundle install
+```shell
+bundle install
+```
 * Prepare database
 ```shell
 rails db:reset
