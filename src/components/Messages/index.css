@@ -1,0 +1,41 @@
+.messages-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .message {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f4f4f4;
+    width: 100%;
+  }
+  
+  .message.error {
+    border-color: #cc5454;
+    background-color: #fceaea;
+  }
+  
+  .message.success {
+    border-color: #4caf50;
+    background-color: #e8f5e9;
+  }
+  
+  .message-text {
+    flex: 1;
+    margin-right: 8px;
+  }
+  
+  .copy-button {
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  

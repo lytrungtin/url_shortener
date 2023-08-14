@@ -1,13 +1,19 @@
 // @flow
 import React from 'react';
-
+import './index.css'
 function renderMessages(messages, type) {
-    
-  console.log(messages);
-  if (!messages) return false;
+  if (!messages) return null;
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+  };
+
   return messages.map((message, index) => (
-    <div key={index} style={{ fontSize: '85%', color: type === 'error' ? '#cc5454' : '#4caf50' }}>
-      {`${message}`}
+    <div key={index} className={`message ${type === 'error' ? 'error' : 'success'}`}>
+      <span className="message-text">{message}</span>
+      <button className="copy-button" onClick={() => copyToClipboard(message)}>
+        Copy
+      </button>
     </div>
   ));
 }
@@ -17,9 +23,10 @@ type Props = {
   type: 'error' | 'success',
 }
 
-const Messages = ({ messages, type }: Props) =>
-  <div>
+const Messages = ({ messages, type }: Props) => (
+  <div className="messages-container">
     {renderMessages(messages, type)}
-  </div>;
+  </div>
+);
 
 export default Messages;
