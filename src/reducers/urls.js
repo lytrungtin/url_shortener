@@ -1,7 +1,6 @@
 const initialState = {
     all: [],
-    encodeUrlErrors: [],
-    decodeUrlErrors: [],
+    UrlErrors: [],
   };
   
   export default function (state = initialState, action) {
@@ -10,23 +9,25 @@ const initialState = {
         return {
           ...state,
           all: action.response.data,
-          encodeUrlErrors: [],
+          UrlMessages: [action.response.data[0].shortened_url],
+          UrlErrors: [],
         };
       case 'DECODE_URL_SUCCESS':
         return {
           ...state,
           all: action.response.data,
-          decodeUrlErrors: [],
+          UrlMessages: [action.response.data[0].original_url],
+          UrlErrors: [],
         };
       case 'ENCODE_URL_FAILURE':
         return {
           ...state,
-          encodeUrlErrors: action.error.errors,
+          UrlErrors: action.error.errors,
         };
       case 'DECODE_URL_FAILURE':
         return {
           ...state,
-          decodeUrlErrors: action.error.errors,
+          UrlErrors: action.error.errors,
         };
       default:
         return state;

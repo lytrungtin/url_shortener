@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css, StyleSheet } from 'aphrodite';
 import { encodeUrl, decodeUrl } from '../../actions/urls';
-import EncodeUrlForm from '../../components/EncodeUrlForm';
-import DecodeUrlForm from '../../components/DecodeUrlForm';
+import UrlForm from '../../components/UrlForm';
 import Navbar from '../../components/Navbar';
 
 const styles = StyleSheet.create({
@@ -18,8 +17,7 @@ const styles = StyleSheet.create({
 type Props = {
   encodeUrl: () => void,
   decodeUrl: () => void,
-  encodeUrlErrors: Array<string>,
-  decodeUrlErrors: Array<string>,
+  UrlErrors: Array<string>
 }
 
 class Home extends Component {
@@ -36,12 +34,9 @@ class Home extends Component {
       <div style={{ flex: '1' }}>
         <Navbar />
         <div className={`card ${css(styles.card)}`}>
-          <h3 style={{ marginBottom: '2rem', textAlign: 'center' }}>Encode URL</h3>
-          <EncodeUrlForm onSubmit={this.handleEncodeURLSubmit} errors={this.props.encodeUrlErrors} />
-        </div>
-        <div className={`card ${css(styles.card)}`}>
-          <h3 style={{ marginBottom: '2rem', textAlign: 'center' }}>Decode URL</h3>
-          <DecodeUrlForm onSubmit={this.handleDecodeURLSubmit} errors={this.props.decodeUrlErrors} />
+          <h3 style={{ marginBottom: '2rem', textAlign: 'center' }}>Shortener URL</h3>
+          <UrlForm onEncode={this.handleEncodeURLSubmit} onDecode={this.handleDecodeURLSubmit} 
+          messages={this.props.UrlMessages} errors={this.props.UrlErrors} />
         </div>
       </div>
     );
@@ -51,8 +46,8 @@ class Home extends Component {
 export default connect(
   state => ({
     urls: state.urls.all,
-    encodeUrlErrors: state.urls.encodeUrlErrors,
-    decodeUrlErrors: state.urls.decodeUrlErrors,
+    UrlErrors: state.urls.UrlErrors,
+    UrlMessages: state.urls.UrlMessages
   }),
   { encodeUrl, decodeUrl }
 )(Home);
