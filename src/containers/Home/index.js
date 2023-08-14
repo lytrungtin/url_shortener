@@ -34,7 +34,7 @@ class Home extends Component {
       <div style={{ flex: '1' }}>
         <Navbar />
         <div className={`card ${css(styles.card)}`}>
-          <h3 style={{ marginBottom: '2rem', textAlign: 'center' }}>Shortener URL</h3>
+          <h3 style={{ marginBottom: '2rem', textAlign: 'center' }}>Link Đây Nè</h3>
           <UrlForm onEncode={this.handleEncodeURLSubmit} onDecode={this.handleDecodeURLSubmit} 
           messages={this.props.UrlMessages} errors={this.props.UrlErrors} />
         </div>
