@@ -43,7 +43,7 @@ class UrlForm extends Component {
             <div className="input-group">
               <Field
                 name="field_value"
-                placeholder="What's URL?"
+                placeholder="Link nào đâu?"
                 component="textarea"
                 className="form-control"
                 style={{ width: '100%' }}
@@ -53,10 +53,10 @@ class UrlForm extends Component {
             </div>
             <div className="input-group-btn">
               <button type="button" className="btn btn-primary" disabled={submitting} onClick={this.handleEncode}>
-                {submitting ? 'Encoding...' : 'Encode'}
+                {submitting ? 'Đang rút gọn...' : 'Rút gọn link'}
               </button>
               <button type="button" className="btn btn-primary" disabled={submitting} onClick={this.handleDecode} style={{'float': 'right'}}>
-                {submitting ? 'Decoding...' : 'Decode'}
+                {submitting ? 'Đang trả về link đầy đủ...' : 'Trả về link đầy đủ'}
               </button>
             </div>
             <Errors errors={errors} />
