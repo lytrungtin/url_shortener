@@ -80,4 +80,9 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-    url: <%= ENV["MY_APP_DATABASE_URL"] %>
+  <<: *default
+  database: shortening_production
+  username: shortening
+  password: <%= ENV["SHORTENING_DATABASE_PASSWORD"] %>
+  url: <%= ENV["DATABASE_URL"] %>
+  
