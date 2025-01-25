@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
 
 const Navbar = () =>
   <nav className={css(styles.navbar)}>
-    <Link to="/" className={css(styles.link)}>Url Shortener Forever</Link>
+    <Link to="/" className={css(styles.link)}>Link Đây Nè</Link>
   </nav>;
 
 export default Navbar;
